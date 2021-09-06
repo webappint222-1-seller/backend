@@ -1,3 +1,10 @@
-module.exports = {
-    url: "mongodb://localhost:27017/local"
-  };
+
+module.exports ={
+  HOST:'localhost',
+  USER:'root',
+  PASSWORD:'root',
+  DB:'mydb'
+};
+
+
+

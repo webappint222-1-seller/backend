@@ -1,26 +1,31 @@
 {
-  "name": "backend",
+  "name": "node",
   "version": "1.0.0",
-  "description": "test",
+  "description": "Node.js Restful CRUD API with Node.js, Express and MySQL",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "mysql",
+    "restapi"
+  ],
+  "author": "Por",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webappint222-1-seller/backend.git"
+    "url": "git+https://github.com/"
   },
-  "author": "por",
-  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/webappint222-1-seller/backend/issues"
+    "url": "https://github.com/"
   },
-  "homepage": "https://github.com/webappint222-1-seller/backend#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "mongoose": "^6.0.4",
-    "mysql": "^2.18.1"
-  }
+  "homepage": "https://github.com"
 }

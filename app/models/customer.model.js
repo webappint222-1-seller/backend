@@ -40,7 +40,7 @@ const Customer = function(customer) {
 // };
 
 Customer.getAll = result => {
-  sql.query("SELECT * FROM user", (err, res) => {
+  sql.query("SELECT * FROM product", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -48,6 +48,20 @@ Customer.getAll = result => {
     }
 
     console.log("customers: ", res);
+    result(null, res);
+  });
+};
+
+//test
+Customer.getAll1 = result => {
+  sql.query("SELECT * FROM product", (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+
+    console.log("product: ", res);
     result(null, res);
   });
 };

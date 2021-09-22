@@ -13,7 +13,7 @@
     "mysql",
     "restapi"
   ],
-  "author": "bezkoder",
+  "author": "Por",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",

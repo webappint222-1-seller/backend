@@ -3,22 +3,22 @@ const sql = require("./db.js");
 // constructor
 const Customer = function(customer) {
   this.email = customer.email;
-  this.name = customer.name;
-  this.active = customer.active;
+  this.password = customer.password;
+  this.detailid = customer.detailid;
 };
 
-// Customer.create = (newCustomer, result) => {
-//   sql.query("INSERT INTO customers SET ?", newCustomer, (err, res) => {
-//     if (err) {
-//       console.log("error: ", err);
-//       result(err, null);
-//       return;
-//     }
+Customer.create = (newCustomer, result) => {
+  sql.query("INSERT INTO customers SET ?", newCustomer, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
 
-//     console.log("created customer: ", { id: res.insertId, ...newCustomer });
-//     result(null, { id: res.insertId, ...newCustomer });
-//   });
-// };
+    console.log("created customer: ", { id: res.insertId, ...newCustomer });
+    result(null, { id: res.insertId, ...newCustomer });
+  });
+};
 
 // Customer.findById = (customerId, result) => {
 //   sql.query(`SELECT * FROM customers WHERE id = ${customerId}`, (err, res) => {
@@ -54,8 +54,8 @@ Customer.getAll = result => {
 
 // Customer.updateById = (id, customer, result) => {
 //   sql.query(
-//     "UPDATE customers SET email = ?, name = ?, active = ? WHERE id = ?",
-//     [customer.email, customer.name, customer.active, id],
+//     "UPDATE customers SET email = ?, password = ?, detailid = ? WHERE id = ?",
+//     [customer.email, customer.password, customer.detailid, id],
 //     (err, res) => {
 //       if (err) {
 //         console.log("error: ", err);

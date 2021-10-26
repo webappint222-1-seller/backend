@@ -8,8 +8,12 @@ exports.create = (req, res) => {
   }
 
   const product = new Product({
-    name: req.body.name,
+    // product_id: req.body.product_id,
+    product_name: req.body.product_name,
+    band_name: req.body.band_name,
     price: req.body.price,
+    product_des: req.body.product_des,
+    image: req.body.image
   });
 
   Product.create(product, (err, data) => {

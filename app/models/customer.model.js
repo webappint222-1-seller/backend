@@ -8,20 +8,20 @@ const Customer = function(customer) {
 };
 
 // Customer.create = (newCustomer, result) => {
-//   sql.query("INSERT INTO customers SET ?", newCustomer, (err, res) => {
+//   sql.query("INSERT INTO user SET ?", newCustomer, (err, res) => {
 //     if (err) {
 //       console.log("error: ", err);
 //       result(err, null);
 //       return;
 //     }
 
-//     console.log("created customer: ", { id: res.insertId, ...newCustomer });
+//     console.log("created user: ", { id: res.insertId, ...newCustomer });
 //     result(null, { id: res.insertId, ...newCustomer });
 //   });
 // };
 
 // Customer.findById = (customerId, result) => {
-//   sql.query(`SELECT * FROM customers WHERE id = ${customerId}`, (err, res) => {
+//   sql.query(`SELECT * FROM user WHERE id = ${customerId}`, (err, res) => {
 //     if (err) {
 //       console.log("error: ", err);
 //       result(err, null);
@@ -52,19 +52,6 @@ Customer.getAll = result => {
   });
 };
 
-//test
-Customer.getAll1 = result => {
-  sql.query("SELECT * FROM product", (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
-
-    console.log("product: ", res);
-    result(null, res);
-  });
-};
 
 // Customer.updateById = (id, customer, result) => {
 //   sql.query(

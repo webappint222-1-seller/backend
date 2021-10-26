@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
+const sql = require("./app/models/db.js");
 // var upload = multer();
 const app = express();
 
@@ -23,8 +23,12 @@ app.get("/", (req, res) => {
   res.json({ message: "Look like your server is working! " });
 });
 
-require("./app/routes/customer.routes.js")(app);
-require("./app/routes/product.routes.js")(app);
+app.get("/uploaded", (req, res) => {
+  res.json({ message: "Look like your it's working! " });
+});
+
+// require("./app/routes/customer.routes.js")(app);
+// require("./app/routes/product.routes.js")(app);
 
 
 
@@ -46,14 +50,11 @@ const multerSigleUpload = multer({
 
 
 
-//route for single file upload
-app.post("/singleFile", multerSigleUpload.single('singleImage'), function(req, res) {
+
+app.post("/singleFile", multerSigleUpload.single('singleImage'), function(req, res, next) {
     const file = req.file
-    if (!file) {
-        return res.end("Please choose file to upload!");
-    }
     req.app.locals.uploadStatus = true;
-    res.redirect('/');
+    res.redirect('/uploaded');
 });
 
 

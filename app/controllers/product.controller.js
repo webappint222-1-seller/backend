@@ -16,7 +16,7 @@ exports.create = (req, res) => {
     image: req.body.image
   });
 
-  Product.create(product, (err, data) => {
+  Product.create(product,(err, data) => {
     if (err)
       res.status(500).send({
         message:

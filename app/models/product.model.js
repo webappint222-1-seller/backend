@@ -52,18 +52,18 @@ const Product = function(product) {
     result({ kind: "not_found" }, null);
   });
 };
-Product.create = (newProduct, result) => {
-  sql.query(`INSERT INTO product SET ?`, newProduct,upload.single('image'), (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(err, null);
-      return;
-    }
+// Product.create = (newProduct, result) => {
+//   sql.query(`INSERT INTO product SET ?`, newProduct,upload.single('image'), (err, res) => {
+//     if (err) {
+//       console.log("error: ", err);
+//       result(err, null);
+//       return;
+//     }
 
-    console.log("created product: ", { product_id: res.insertId, ...newProduct });
-    result(null, { product_id: res.insertId, ...newProduct });
-  });
-};
+//     console.log("created product: ", { product_id: res.insertId, ...newProduct });
+//     result(null, { product_id: res.insertId, ...newProduct });
+//   });
+// };
 Product.updateById = (product_id, product, result) => {
   sql.query(
     "UPDATE product SET product_name = ?, band_name = ?, price = ?,product_des = ? WHERE product_id = ?",

@@ -67,7 +67,7 @@ const Product = function(product) {
 Product.updateById = (product_id, product, result) => {
   sql.query(
     "UPDATE product SET product_name = ?, band_name = ?, price = ?,product_des = ? WHERE product_id = ?",
-    [customer.email, customer.password, customer.detailid, id],
+    [product.product_name, product.band_name, product.price,product.product_des, product_id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);

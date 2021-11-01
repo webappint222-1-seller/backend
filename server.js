@@ -69,6 +69,18 @@ app.post('/formdataupload', multerSigleUpload.single('profile'), function (req, 
   res.redirect('/uploaded');
 });
 
+app.post('/formdatausersupload', multerSigleUpload.single('profile') ,function (req, res) {
+  console.log('file received');
+  console.log(req);
+  var db = "INSERT INTO `user` (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + req.body.password + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + Date.now() + "','" + req.body.address + "','" + req.body.role + "')";
+  sql.query(db, function (err, result) {
+    console.log('inserted data');
+    console.log(db);
+    console.log(result);
+  });
+  res.redirect('/uploaded');
+});
+
 const PORT = process.env.PORT || 3006;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

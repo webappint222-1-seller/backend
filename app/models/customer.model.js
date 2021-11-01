@@ -1,9 +1,13 @@
 const sql = require("./db.js");
 
 const Customer = function(customer) {
-  this.email = customer.email;
+  this.emailaddress = customer.emailaddress;
   this.password = customer.password;
-  this.detailid = customer.detailid;
+  this.name = customer.name;
+  this.phonenumber = customer.phonenumber;
+  this.dob = customer.dob;
+  this.address = customer.address;
+  this.role = customer.role;
 };
 
 Customer.create = (newCustomer, result) => {
@@ -14,13 +18,13 @@ Customer.create = (newCustomer, result) => {
       return;
     }
 
-    console.log("created user: ", { id: res.insertId, ...newCustomer });
-    result(null, { id: res.insertId, ...newCustomer });
+    console.log("created user: ", { user_id: res.insertId, ...newCustomer });
+    result(null, { user_id: res.insertId, ...newCustomer });
   });
 };
 
-Customer.findById = (customerId, result) => {
-  sql.query(`SELECT * FROM user WHERE id = ${customerId}`, (err, res) => {
+Customer.findById = (user_id, result) => {
+  sql.query(`SELECT * FROM user WHERE user_id = ${user_id}`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -52,10 +56,10 @@ Customer.getAll = result => {
 };
 
 
-Customer.updateById = (id, customer, result) => {
+Customer.updateById = (user_id, customer, result) => {
   sql.query(
-    "UPDATE customers SET email = ?, password = ?, detailid = ? WHERE id = ?",
-    [customer.email, customer.password, customer.detailid, id],
+    "UPDATE customers SET emailaddress = ?, password = ?, name = ? , phonenumber = ? , DOB = ?, address = ? WHERE user_id = ?",
+    [customer.emailaddress, customer.password, customer.name, customer.phonenumber,customer.dob,customer.address ,user_id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -69,14 +73,14 @@ Customer.updateById = (id, customer, result) => {
         return;
       }
 
-      console.log("updated customer: ", { id: id, ...customer });
-      result(null, { id: id, ...customer });
+      console.log("updated customer: ", { user_id: user_id, ...customer });
+      result(null, { user_id: user_id, ...customer });
     }
   );
 };
 
-Customer.remove = (id, result) => {
-  sql.query("DELETE FROM customers WHERE id = ?", id, (err, res) => {
+Customer.remove = (user_id, result) => {
+  sql.query("DELETE FROM customers WHERE user_id = ?", user_id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -89,13 +93,13 @@ Customer.remove = (id, result) => {
       return;
     }
 
-    console.log("deleted customer with id: ", id);
+    console.log("deleted customer with user_id: ", user_id);
     result(null, res);
   });
 };
 
 Customer.removeAll = result => {
-  sql.query("DELETE FROM customers", (err, res) => {
+  sql.query("DELETE FROM users", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

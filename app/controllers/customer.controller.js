@@ -9,9 +9,13 @@ exports.create = (req, res) => {
 
 
   const customer = new Customer({
-    email: req.body.email,
+    emailaddress: req.body.emailaddress,
+    password: req.body.password,
     name: req.body.name,
-    active: req.body.active
+    phonenumber: req.body.phonenumber,
+    dob: req.body.dob,
+    address: req.body.address,
+    role: req.body.role,
   });
 
 

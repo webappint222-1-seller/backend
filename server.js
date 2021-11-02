@@ -66,19 +66,19 @@ app.post('/formdataupload', multerSigleUpload.single('profile'), function (req, 
     console.log(db);
     console.log(result);
   });
-  res.redirect('/uploaded');
+  res.redirect('/');
 });
 
 app.post('/formdatausersupload', multerSigleUpload.single('profile') ,function (req, res) {
   console.log('file received');
   console.log(req);
-  var db = "INSERT INTO `user` (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + req.body.password + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + Date.now() + "','" + req.body.address + "','" + req.body.role + "')";
-  sql.query(db, function (err, result) {
+  var db1 = "INSERT INTO user (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + req.body.password + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + req.body.dob + "','" + req.body.address + "','" + req.body.role + "')";
+  sql.query(db1, function (err, result1) {
     console.log('inserted data');
-    console.log(db);
-    console.log(result);
+    console.log(db1);
+    console.log(result1);
   });
-  res.redirect('/uploaded');
+  res.redirect('/');
 });
 
 const PORT = process.env.PORT || 3006;

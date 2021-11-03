@@ -57,7 +57,7 @@ app.use('/upload', express.static('public'));
 //   res.redirect('/uploaded');
 // });
 
-app.post('/formdataupload', multerSigleUpload.single('profile'), function (req, res) {
+app.post('/formdataupload', multerSigleUpload.single('image'), function (req, res) {
   console.log('file received');
   console.log(req);
   var db = "INSERT INTO `product`(`product_name`, `band_name`, `price`,`product_des`,`image`) VALUES ('" + req.body.product_name + "', '" + req.body.band_name + "', '" + req.body.price + "','" + req.body.product_des + "','" + req.file.originalname + "')";
@@ -77,6 +77,18 @@ app.post('/formdatausersupload', multerSigleUpload.single('profile') ,function (
     console.log('inserted data');
     console.log(db1);
     console.log(result1);
+  });
+  res.redirect('/');
+});
+
+app.put('/update/:productId', multerSigleUpload.single('profile') ,function (req, res) {
+  console.log('file received');
+  console.log(req);
+  var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '" + req.file.originalname + "' WHERE product_id = '" + req.params.productId + "'"
+  sql.query(db2, function (err, result2) {
+    console.log('inserted data');
+    console.log(db2);
+    console.log(result2);
   });
   res.redirect('/');
 });

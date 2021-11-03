@@ -1,6 +1,7 @@
 const multer = require("multer");
 const sql = require("./db.js");
 
+
 const Product = function(product) {
   this.product_name = product.product_name;
   this.band_name = product.band_name;

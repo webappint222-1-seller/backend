@@ -69,3 +69,31 @@ exports.findAll = (req, res) => {
     });
   };
   
+  exports.update = (req, res) => {
+
+    if (!req.body) {
+      res.status(400).send({
+        message: "Content can not be empty!"
+      });
+    }
+  
+    console.log(req.body);
+  
+    Product.updateById(
+      req.params.productId,
+      new Product(req.body),
+      (err, data) => {
+        if (err) {
+          if (err.kind === "not_found") {
+            res.status(404).send({
+              message: `Not found products with id ${req.params.productId}.`
+            });
+          } else {
+            res.status(500).send({
+              message: "Error updating products with id " + req.params.productId
+            });
+          }
+        } else res.send(data);
+      }
+    );
+  };

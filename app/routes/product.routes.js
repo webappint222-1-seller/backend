@@ -5,4 +5,5 @@ module.exports = app => {
     app.get("/products/:productId", product.findOne);
     // app.post("/products/create", product.create);
     app.delete("/products/:productId", product.delete);
+    app.put("/products/:productId", product.update);
 }  

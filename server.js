@@ -69,7 +69,19 @@ app.post('/formdataupload', multerSigleUpload.single('image'), function (req, re
   res.redirect('/');
 });
 
-app.post('/formdatausersupload', multerSigleUpload.single('profile') ,function (req, res) {
+app.put('/productupdate/:productId', multerSigleUpload.single('image') ,function (req, res) {
+  console.log('file received');
+  console.log(req);
+  var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '" + req.file.originalname + "' WHERE product_id = '" + req.params.productId + "'"
+  sql.query(db2, function (err, result2) {
+    console.log('inserted data');
+    console.log(db2);
+    console.log(result2);
+  });
+  res.redirect('/');
+});
+
+app.post('/formdatausersupload', multerSigleUpload.single('image') ,function (req, res) {
   console.log('file received');
   console.log(req);
   var db1 = "INSERT INTO user (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + req.body.password + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + req.body.dob + "','" + req.body.address + "','" + req.body.role + "')";
@@ -81,14 +93,14 @@ app.post('/formdatausersupload', multerSigleUpload.single('profile') ,function (
   res.redirect('/');
 });
 
-app.put('/update/:productId', multerSigleUpload.single('profile') ,function (req, res) {
+app.put('/userupdate/:userId', multerSigleUpload.single('image'),function (req, res) {
   console.log('file received');
   console.log(req);
-  var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '" + req.file.originalname + "' WHERE product_id = '" + req.params.productId + "'"
-  sql.query(db2, function (err, result2) {
+  var db4 = "UPDATE user SET `password` = '" + req.body.password + "' WHERE user_id = '" + req.params.userId + "'"
+  sql.query(db4, function (err, result4) {
     console.log('inserted data');
-    console.log(db2);
-    console.log(result2);
+    console.log(db4);
+    console.log(result4);
   });
   res.redirect('/');
 });

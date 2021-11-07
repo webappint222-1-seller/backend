@@ -84,7 +84,7 @@ app.put('/productupdate/:productId', multerSigleUpload.single('image') ,function
 app.post('/formdatausersupload', multerSigleUpload.single('image') ,function (req, res) {
   console.log('file received');
   console.log(req);
-  var db1 = "INSERT INTO user (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + req.body.password + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + req.body.dob + "','" + req.body.address + "','" + req.body.role + "')";
+  var db1 = "INSERT INTO user (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + req.body.password + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + req.body.dob + "','" + req.body.address + "','" + 2 + "')";
   sql.query(db1, function (err, result1) {
     console.log('inserted data');
     console.log(db1);

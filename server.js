@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const app = express();
 const sql = require("./app/models/db.js");
-const indexRouter = require('./router.js');
+
 const router = express.Router();
 const { signupValidation, loginValidation } = require("./app/models/validation.js");
 const { validationResult } = require('express-validator');
@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
   next();
 })
 
-app.use('/api', indexRouter);
+
 app.get("/", (req, res) => {
   res.json({ message: "Look like your server is working! " });
 });
@@ -157,13 +157,20 @@ app.post('/formdatausersupload', loginValidation, multerSigleUpload.single('imag
 app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
   console.log('file received');
   console.log(req);
-  var db = "SELECT password FROM user where emailaddress = '" + req.body.emailaddress + "'"
+  var db = "SELECT * FROM user where emailaddress = '" + req.body.emailaddress + "'"
   sql.connect((err) => {
     sql.query(db, function (err, result1) {
       bcrypt.compare(req.body.password, result1[0].password, function (err, result) {
         if (result == true) {
-          var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+          var token = jwt.sign({id:result1[0].user_id},'secrect',{ expiresIn: '1h' });
           console.log(token);
+          return res.status(200).send({
+            msg: 'pass',
+            token,
+            userid: result1[0].user_id,
+            username: result1[0].name,
+            emailaddress: result1[0].emailaddress
+          })
         }
       });
       console.log(result1)
@@ -175,7 +182,7 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
   //     console.log(token);
   //   }
   // });
-  res.redirect('/');
+
 
 });
 
@@ -209,7 +216,7 @@ app.put('/userupdate/:userId', multerSigleUpload.single('image'), function (req,
 
 
 
-router.post('/getuser', signupValidation, (req, res, next) => {
+app.post('/getuser', signupValidation, multerSigleUpload.single('image'), (req, res, next) => {
   if (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith('Bearer') ||
@@ -220,10 +227,10 @@ router.post('/getuser', signupValidation, (req, res, next) => {
     });
   }
   const theToken = req.headers.authorization.split(' ')[1];
-  const decoded = jwt.verify(theToken, 'the-super-strong-secrect');
-  db.query('SELECT * FROM user where user_id=?', decoded.user_id, function (error, results, fields) {
+  const decoded = jwt.verify(theToken, 'secrect');
+  sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results, fields) {
     if (error) throw error;
-    return res.send({ error: false, data: results[0], message: 'Fetch Successfully.' });
+    return res.send({  data: results[0], message: 'Fetch Successfully.' });
   });
 });
 

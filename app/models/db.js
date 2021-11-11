@@ -9,6 +9,8 @@ var sql = mysql.createConnection({
   dateStrings:true
 });
 
+
+
 // sql.connect((err) => {
 //   if (err) {
 //     console.log("Database Connection Failed !!!", err);

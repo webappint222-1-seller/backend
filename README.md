@@ -14,5 +14,6 @@ create('/formdatausersupload')
 get("/customers")
 get("/customers/:customerId")
 <!-- delete("/customers/:customerId") -->
-
+post("/login") to get Bearer token
+post("/getuser") to get userdata and role
 

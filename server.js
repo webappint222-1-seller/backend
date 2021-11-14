@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const app = express();
 const sql = require("./app/models/db.js");
-
+const cookieParser = require('cookie-parser')
 const router = express.Router();
 const { signupValidation, loginValidation } = require("./app/models/validation.js");
 const { validationResult } = require('express-validator');
@@ -22,8 +22,12 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 })
-
-
+const corsOptions = {
+  origin: 'http://localhost:8080',
+  credentials: true,
+};
+app.use(cookieParser())
+app.use(cors(corsOptions));
 app.get("/", (req, res) => {
   res.json({ message: "Look like your server is working! " });
 });
@@ -47,12 +51,9 @@ const storage = multer.diskStorage({
   },
 
   filename: function (res, file, callback) {
-    if (file.originalname == "undefined") {
-      callback(null, "404.png")
-    }
-    else {
+    
       callback(null, suff + ".png")
-    }
+
   }
 });
 
@@ -104,23 +105,12 @@ app.post('/formdataupload', multerSigleUpload.single('image'), function (req, re
 app.put('/productupdate/:productId', multerSigleUpload.single('image'), function (req, res, next) {
   console.log('file received');
   console.log(req);
-  if (!req.file) {
-    var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '" + "404" + "' WHERE product_id = '" + req.params.productId + "'"
+    var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '"+ suff + ".png"+ "' WHERE product_id = '" + req.params.productId + "'"
     sql.query(db2, function (err, result2) {
       console.log('inserted data');
       console.log(db2);
       console.log(result2);
     });
-  }
-  else {
-    var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '" + req.file.originalname + "' WHERE product_id = '" + req.params.productId + "'"
-    sql.query(db2, function (err, result2) {
-      console.log('inserted data');
-      console.log(db2);
-      console.log(result2);
-    });
-  }
-
   res.redirect('/');
 });
 
@@ -134,12 +124,10 @@ app.post('/formdatausersupload', loginValidation, multerSigleUpload.single('imag
         bcrypt.hash(req.body.password, 10, function (err, hash) {
           var db1 = "INSERT INTO user (`emailaddress`, `password`, `name`,`phonenumber`,`DOB`,`address`,`role`) VALUES ('" + req.body.emailaddress + "', '" + hash + "', '" + req.body.name + "','" + req.body.phonenumber + "','" + req.body.dob + "','" + req.body.address + "','" + 2 + "')";
           sql.query(db1, function (err, result1) {
-            console.log('inserted data');
-            console.log(db1);
-            console.log(result1);
+            console.log("pass");
           });
         });
-      }
+      } 
     })
   });
 
@@ -164,18 +152,18 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
         if (result == true) {
           var token = jwt.sign({id:result1[0].user_id},'secrect',{ expiresIn: '1h' });
           console.log(token);
-          return res.status(200).send({
-            msg: 'pass',
-            token,
-            userid: result1[0].user_id,
-            username: result1[0].name,
-            emailaddress: result1[0].emailaddress
-          })
+          res.cookie('jwt' , token , {maxAge: 900000, httpOnly: true} );
+          res.status(200).json("pass");
+        } else{
+          return res.status(401).json("email or password is wrong")
         }
+        
       });
-      console.log(result1)
+      
+
     });
   });
+ 
   // bcrypt.compare(req.body.password, "$2a$10$VD53K9UoFs6UdhTdh7Y/9.2VAQmnqwmlJd506.mrAdIJT1BKSpknm", function (err, result) {
   //   if(result == true){
   //     var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
@@ -216,21 +204,16 @@ app.put('/userupdate/:userId', multerSigleUpload.single('image'), function (req,
 
 
 
-app.post('/getuser', signupValidation, multerSigleUpload.single('image'), (req, res, next) => {
-  if (
-    !req.headers.authorization ||
-    !req.headers.authorization.startsWith('Bearer') ||
-    !req.headers.authorization.split(' ')[1]
-  ) {
-    return res.status(422).json({
-      message: "Please provide the token",
-    });
+app.get('/getuser', multerSigleUpload.single('image'), (req, res, next) => {
+ 
+  const theCookie = req.cookies['jwt'];
+  const decoded = jwt.verify(theCookie, 'secrect');
+  if(!decoded){
+    return res.status(401).send("unauthebtucated")
   }
-  const theToken = req.headers.authorization.split(' ')[1];
-  const decoded = jwt.verify(theToken, 'secrect');
   sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results, fields) {
     if (error) throw error;
-    return res.send({  data: results[0], message: 'Fetch Successfully.' });
+    res.send({  data: results[0], message: 'Fetch Successfully.' });
   });
 });
 

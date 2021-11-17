@@ -17,11 +17,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cors());
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', "*");
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Origin', "http://localhost:8080");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.header('Access-Control-Allow-Credentials', true); 
   next();
-})
+});
 const corsOptions = {
   origin: 'http://localhost:8080',
   credentials: true,
@@ -150,17 +152,14 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
     sql.query(db, function (err, result1) {
       bcrypt.compare(req.body.password, result1[0].password, function (err, result) {
         if (result == true) {
-          var token = jwt.sign({id:result1[0].user_id},'secrect',{ expiresIn: '1h' });
+          var token = jwt.sign({id:result1[0].user_id},'secrect',{ expiresIn: '1d' });
           console.log(token);
-          res.cookie('jwt' , token , {maxAge: 900000, httpOnly: true} );
+          res.cookie('jwt' , token , {maxAge: 24 * 60 * 60 *1000, httpOnly: true} );
           res.status(200).json("pass");
         } else{
-          return res.status(401).json("email or password is wrong")
+          res.status(401).json("email or password is wrong")
         }
-        
       });
-      
-
     });
   });
  
@@ -205,7 +204,9 @@ app.put('/userupdate/:userId', multerSigleUpload.single('image'), function (req,
 
 
 app.get('/getuser', multerSigleUpload.single('image'), (req, res, next) => {
- 
+  if(!req.cookies['jwt']){
+    return res.status(401).send("must login")
+  } else{
   const theCookie = req.cookies['jwt'];
   const decoded = jwt.verify(theCookie, 'secrect');
   if(!decoded){
@@ -214,7 +215,47 @@ app.get('/getuser', multerSigleUpload.single('image'), (req, res, next) => {
   sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results, fields) {
     if (error) throw error;
     res.send({  data: results[0], message: 'Fetch Successfully.' });
+  });}
+});
+
+app.post('/clearuser', multerSigleUpload.single('image'), (req, res, next) => {
+  res.status(202).clearCookie('jwt').send('cookie cleared');
+});
+
+app.post('/checkout', multerSigleUpload.single('image'), (req, res, next) => {
+  const theCookie = req.cookies['jwt'];
+  const decoded = jwt.verify(theCookie, 'secrect');
+  var db = "INSERT INTO `orderdetail`( `order_price`, `order_quantity`,`user_user_id`) VALUES ('" + req.body.order_price + "', '" + req.body.order_quantity + "','" + decoded.id + "')";
+  sql.query(db, function (err, result) {
+    console.log('inserted data');
+    console.log(db);
+    console.log(result);
   });
+  res.redirect('/');
+});
+
+app.put('/checkoutedit/:checkoutid', multerSigleUpload.single('image'), (req, res, next) => {
+  const theCookie = req.cookies['jwt'];
+  const decoded = jwt.verify(theCookie, 'secrect');
+  var db = "UPDATE orderdetail SET order_price = '" + req.body.order_price + "' and  order_quantity = '" + req.body.order_quantity + "' WHERE user_user_id = " + req.params.checkoutid ;
+  sql.query(db, function (err, result) {
+    console.log('inserted data');
+    console.log(db);
+    console.log(result);
+  });
+  res.redirect('/');
+});
+
+app.post('/orderhasproduct', multerSigleUpload.single('image'), (req, res, next) => {
+  const theCookie = req.cookies['jwt'];
+  const decoded = jwt.verify(theCookie, 'secrect');
+  var db = "INSERT INTO `orderdetail_has_product`( `orderDetail_order_id`, `product_product_id`,`total_price_product_id`,`total_quantity_product_id`) VALUES ('" + req.body.orderDetail_order_id + "', '" + req.body.product_product_id + "','" + req.body.total_price_product_id + "', '" + req.body.total_quantity_product_id + "')";
+  sql.query(db, function (err, result) {
+    console.log('inserted data');
+    console.log(db);
+    console.log(result);
+  });
+  res.redirect('/');
 });
 
 const PORT = process.env.PORT || 3006;

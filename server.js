@@ -10,6 +10,8 @@ const { signupValidation, loginValidation } = require("./app/models/validation.j
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+// const fs = require('fs');
+// const https = require('https');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,13 +23,18 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  res.header('Access-Control-Allow-Credentials', true); 
+  // res.header('Access-Control-Allow-Credentials', true); 
   next();
 });
+// const options = {
+//   key: fs.readFileSync('etc/key.pem'),
+//   cert: fs.readFileSync('etc/cert.pem')
+// };
 const corsOptions = {
   origin: 'http://localhost:8080',
   credentials: true,
 };
+
 app.use(cookieParser())
 app.use(cors(corsOptions));
 app.get("/", (req, res) => {
@@ -75,6 +82,7 @@ app.use('/upload', express.static('public'));
 app.post('/formdataupload', multerSigleUpload.single('image'), function (req, res) {
   console.log('file received');
   console.log(req);
+
   var db = "INSERT INTO `product`(`product_name`, `band_name`, `price`,`product_des`,`image`) VALUES ('" + req.body.product_name + "', '" + req.body.band_name + "', '" + req.body.price + "','" + req.body.product_des + "','" + suff + ".png" + "')";
   sql.query(db, function (err, result) {
     console.log('inserted data');
@@ -83,24 +91,8 @@ app.post('/formdataupload', multerSigleUpload.single('image'), function (req, re
   });
   res.redirect('/');
 
-  // app(req, res, function (err) {
-  //   if (!req.file) {
-  //     var db = "INSERT INTO `product`(`product_name`, `band_name`, `price`,`product_des`,`image`) VALUES ('" + req.body.product_name + "', '" + req.body.band_name + "', '" + req.body.price + "','" + req.body.product_des + "','" + "404.png" + "')";
-  //     sql.query(db, function (err, result) {
-  //       console.log('inserted data');
-  //       console.log(db);
-  //       console.log(result);
-  //     });
-  //   }
-  //   var db = "INSERT INTO `product`(`product_name`, `band_name`, `price`,`product_des`,`image`) VALUES ('" + req.body.product_name + "', '" + req.body.band_name + "', '" + req.body.price + "','" + req.body.product_des + "','" + suff + ".png" + "')";
-  //   sql.query(db, function (err, result) {
-  //     console.log('inserted data');
-  //     console.log(db);
-  //     console.log(result);
-  //   });
+  
 
-  // })
-  // res.redirect('/');
 
 });
 
@@ -154,7 +146,7 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
         if (result == true) {
           var token = jwt.sign({id:result1[0].user_id},'secrect',{ expiresIn: '1d' });
           console.log(token);
-          res.cookie('jwt' , token , {maxAge: 24 * 60 * 60 *1000, httpOnly: true} );
+          res.cookie('jwt' , token , {maxAge: 24 * 60 * 60 *1000} );
           res.status(200).json("pass");
         } else{
           res.status(401).json("email or password is wrong")
@@ -173,18 +165,18 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
 
 });
 
-app.put('/userupdate/:userId', multerSigleUpload.single('image'), function (req, res) {
-  console.log('file received');
-  console.log(req);
-  var db4 = "UPDATE user SET `password` = '" + req.body.password + "' WHERE user_id = '" + req.params.userId + "'"
+// app.put('/userupdate/:userId', multerSigleUpload.single('image'), function (req, res) {
+//   console.log('file received');
+//   console.log(req);
+//   var db4 = "UPDATE user SET `password` = '" + req.body.password + "' WHERE user_id = '" + req.params.userId + "'"
 
-  sql.query(db4, function (err, result4) {
-    console.log('inserted data');
-    console.log(db4);
-    console.log(result4);
-  });
-  res.redirect('/');
-});
+//   sql.query(db4, function (err, result4) {
+//     console.log('inserted data');
+//     console.log(db4);
+//     console.log(result4);
+//   });
+//   res.redirect('/');
+// });
 
 
 // app.post('/register' , multerSigleUpload.single('image'), function(req, res)  {
@@ -234,10 +226,23 @@ app.post('/checkout', multerSigleUpload.single('image'), (req, res, next) => {
   res.redirect('/');
 });
 
+app.get('/getcheckout', multerSigleUpload.single('image'), (req, res, next) => {
+  var db = "SELECT product_name FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id";
+  sql.connect((err) => {
+    sql.query(db, function (err, result1) {
+      for (let index = 0; index < result1.length; index++) {
+        var element = result1[index].product_name;
+        console.log(element);
+      }
+      res.send(result1);
+    });
+  });
+});
+
 app.put('/checkoutedit/:checkoutid', multerSigleUpload.single('image'), (req, res, next) => {
-  const theCookie = req.cookies['jwt'];
-  const decoded = jwt.verify(theCookie, 'secrect');
-  var db = "UPDATE orderdetail SET order_price = '" + req.body.order_price + "' and  order_quantity = '" + req.body.order_quantity + "' WHERE user_user_id = " + req.params.checkoutid ;
+  // const theCookie = req.cookies['jwt'];
+  // const decoded = jwt.verify(theCookie, 'secrect');
+  var db = "UPDATE orderdetail SET order_price = '" + req.body.order_price + "' ,  order_quantity = '" + req.body.order_quantity + "' WHERE user_user_id = " + req.params.checkoutid ;
   sql.query(db, function (err, result) {
     console.log('inserted data');
     console.log(db);
@@ -247,8 +252,8 @@ app.put('/checkoutedit/:checkoutid', multerSigleUpload.single('image'), (req, re
 });
 
 app.post('/orderhasproduct', multerSigleUpload.single('image'), (req, res, next) => {
-  const theCookie = req.cookies['jwt'];
-  const decoded = jwt.verify(theCookie, 'secrect');
+  // const theCookie = req.cookies['jwt'];
+  // const decoded = jwt.verify(theCookie, 'secrect');
   var db = "INSERT INTO `orderdetail_has_product`( `orderDetail_order_id`, `product_product_id`,`total_price_product_id`,`total_quantity_product_id`) VALUES ('" + req.body.orderDetail_order_id + "', '" + req.body.product_product_id + "','" + req.body.total_price_product_id + "', '" + req.body.total_quantity_product_id + "')";
   sql.query(db, function (err, result) {
     console.log('inserted data');
@@ -262,3 +267,4 @@ const PORT = process.env.PORT || 3006;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+// https.createServer(options, app).listen(PORT);

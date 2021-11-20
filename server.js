@@ -60,8 +60,8 @@ const storage = multer.diskStorage({
   },
 
   filename: function (res, file, callback) {
-    
-      callback(null, suff + ".png")
+
+    callback(null, suff + ".png")
 
   }
 });
@@ -91,7 +91,7 @@ app.post('/formdataupload', multerSigleUpload.single('image'), function (req, re
   });
   res.redirect('/');
 
-  
+
 
 
 });
@@ -99,12 +99,12 @@ app.post('/formdataupload', multerSigleUpload.single('image'), function (req, re
 app.put('/productupdate/:productId', multerSigleUpload.single('image'), function (req, res, next) {
   console.log('file received');
   console.log(req);
-    var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '"+ suff + ".png"+ "' WHERE product_id = '" + req.params.productId + "'"
-    sql.query(db2, function (err, result2) {
-      console.log('inserted data');
-      console.log(db2);
-      console.log(result2);
-    });
+  var db2 = "UPDATE product SET `product_name` = '" + req.body.product_name + "', `band_name` = '" + req.body.band_name + "' , `price` = '" + req.body.price + "',product_des = '" + req.body.product_des + "',image = '" + suff + ".png" + "' WHERE product_id = '" + req.params.productId + "'"
+  sql.query(db2, function (err, result2) {
+    console.log('inserted data');
+    console.log(db2);
+    console.log(result2);
+  });
   res.redirect('/');
 });
 
@@ -121,7 +121,7 @@ app.post('/formdatausersupload', loginValidation, multerSigleUpload.single('imag
             console.log("pass");
           });
         });
-      } 
+      }
     })
   });
 
@@ -136,7 +136,7 @@ app.post('/formdatausersupload', loginValidation, multerSigleUpload.single('imag
   res.redirect('/');
 });
 
-app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
+app.post('/login', multerSigleUpload.single('image'), function (req, res) {
   console.log('file received');
   console.log(req);
   var db = "SELECT * FROM user where emailaddress = '" + req.body.emailaddress + "'"
@@ -144,17 +144,17 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
     sql.query(db, function (err, result1) {
       bcrypt.compare(req.body.password, result1[0].password, function (err, result) {
         if (result == true) {
-          var token = jwt.sign({id:result1[0].user_id},'secrect',{ expiresIn: '1d' });
+          var token = jwt.sign({ id: result1[0].user_id }, 'secrect', { expiresIn: '1d' });
           console.log(token);
-          res.cookie('jwt' , token , {maxAge: 24 * 60 * 60 *1000} );
+          res.cookie('jwt', token, { maxAge: 24 * 60 * 60 * 1000 });
           res.status(200).json("pass");
-        } else{
+        } else {
           res.status(401).json("email or password is wrong")
         }
       });
     });
   });
- 
+
   // bcrypt.compare(req.body.password, "$2a$10$VD53K9UoFs6UdhTdh7Y/9.2VAQmnqwmlJd506.mrAdIJT1BKSpknm", function (err, result) {
   //   if(result == true){
   //     var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
@@ -196,18 +196,19 @@ app.post('/login',  multerSigleUpload.single('image'), function (req, res) {
 
 
 app.get('/getuser', multerSigleUpload.single('image'), (req, res, next) => {
-  if(!req.cookies['jwt']){
+  if (!req.cookies['jwt']) {
     return res.status(401).send("must login")
-  } else{
-  const theCookie = req.cookies['jwt'];
-  const decoded = jwt.verify(theCookie, 'secrect');
-  if(!decoded){
-    return res.status(401).send("unauthebtucated")
+  } else {
+    const theCookie = req.cookies['jwt'];
+    const decoded = jwt.verify(theCookie, 'secrect');
+    if (!decoded) {
+      return res.status(401).send("unauthebtucated")
+    }
+    sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results) {
+      if (error) throw error;
+      res.send({ data: results[0], message: 'Fetch Successfully.' });
+    });
   }
-  sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results) {
-    if (error) throw error;
-    res.send({  data: results[0], message: 'Fetch Successfully.' });
-  });}
 });
 
 app.post('/clearuser', multerSigleUpload.single('image'), (req, res, next) => {
@@ -215,59 +216,78 @@ app.post('/clearuser', multerSigleUpload.single('image'), (req, res, next) => {
 });
 
 app.post('/checkout', multerSigleUpload.single('image'), (req, res, next) => {
-  const theCookie = req.cookies['jwt'];
-  const decoded = jwt.verify(theCookie, 'secrect');
-  var db = "INSERT INTO `orderdetail`( `order_price`, `order_quantity`,`user_user_id`) VALUES ('" + req.body.order_price + "', '" + req.body.order_quantity + "','" + decoded.id + "')";
-  sql.query(db, function (err, result) {
-    console.log('inserted data');
-    console.log(db);
-    console.log(result);
-  });
+  if (!req.cookies['jwt']) {
+    return res.status(401).send("must login to see cart")
+  } else {
+    const theCookie = req.cookies['jwt'];
+    const decoded = jwt.verify(theCookie, 'secrect');
+    console.log(decoded);
+    if (!decoded) {
+      return res.status(401).send("unauthebtucated")
+    }
+    var db = "select order_id from orderdetail where order_id=(select max(order_id) from orderdetail);"
+      sql.query(db, function (err, result) {
+        console.log(db);
+        console.log(result);
+        var db2 = "INSERT INTO `orderdetail`( `order_price`, `order_quantity`,`user_user_id`) VALUES ('" + req.body.order_price + "', '" + req.body.order_quantity + "','" + decoded.id + "')";
+        sql.query(db2, function (err, result2) {
+          console.log(db2);
+          console.log(result2);
+        });
+        var plus = result[0].order_id + 1;
+        var a = req.body.order_price * req.body.order_quantity
+          var db1 = "INSERT INTO `orderdetail_has_product`(`orderDetail_order_id`, `product_product_id`, `total_price_product_id`,`total_quantity_product_id`) VALUES ('" + plus + "','" + req.body.product_id + "', '" + a + "','" + req.body.order_quantity + "')";
+          sql.connect((err) => {
+          sql.query(db1, function (err, result1) {
+            console.log(db1);
+            console.log(result1);
+           });
+          });
+      });
+  }
   res.redirect('/');
 });
 
+
 app.get('/getcheckout', multerSigleUpload.single('image'), (req, res, next) => {
-  var db = "SELECT product_name FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id";
+  var db = "SELECT * FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id";
   sql.connect((err) => {
     sql.query(db, function (err, result1) {
       for (let index = 0; index < result1.length; index++) {
         var element = result1[index].product_name;
         console.log(element);
       }
+      console.log(result1);
       res.send(result1);
     });
   });
 });
 
 app.get('/getcheckoutbyid', multerSigleUpload.single('image'), (req, res, next) => {
-  if(!req.cookies['jwt']){
+  if (!req.cookies['jwt']) {
     return res.status(401).send("must login to see cart")
-  } else{
-  const theCookie = req.cookies['jwt'];
-  const decoded = jwt.verify(theCookie, 'secrect');
-  if(!decoded){
-    return res.status(401).send("unauthebtucated")
-  }
- 
-    var db = "SELECT product_name FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id and user_user_id = " + decoded.id;
+  } else {
+    const theCookie = req.cookies['jwt'];
+    const decoded = jwt.verify(theCookie, 'secrect');
+    if (!decoded) {
+      return res.status(401).send("unauthebtucated")
+    }
+    var db = "SELECT product_name FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id and od.user_user_id = " + decoded.id;
     sql.connect((err) => {
       sql.query(db, function (err, result1) {
-        for (let index = 0; index < result1.length; index++) {
-          var element = result1[index].product_name;
-          console.log(element);
-        }
         res.send(result1);
+        console.log(result1);
         console.log("kay");
       });
     });
-  
-}
+  }
 });
+
 
 app.put('/checkoutedit/:checkoutid', multerSigleUpload.single('image'), (req, res, next) => {
   // const theCookie = req.cookies['jwt'];
   // const decoded = jwt.verify(theCookie, 'secrect');
-  var db = "UPDATE orderdetail SET order_price = '" + req.body.order_price + "' ,  order_quantity = '" + req.body.order_quantity + "' WHERE user_user_id = " + req.params.checkoutid ;
+  var db = "UPDATE orderdetail SET order_price = '" + req.body.order_price + "' ,  order_quantity = '" + req.body.order_quantity + "' WHERE user_user_id = " + req.params.checkoutid;
   sql.query(db, function (err, result) {
     console.log('inserted data');
     console.log(db);

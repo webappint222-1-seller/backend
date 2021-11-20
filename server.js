@@ -204,7 +204,7 @@ app.get('/getuser', multerSigleUpload.single('image'), (req, res, next) => {
   if(!decoded){
     return res.status(401).send("unauthebtucated")
   }
-  sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results, fields) {
+  sql.query('SELECT * FROM user where user_id=?', decoded.id, function (error, results) {
     if (error) throw error;
     res.send({  data: results[0], message: 'Fetch Successfully.' });
   });}
@@ -237,6 +237,31 @@ app.get('/getcheckout', multerSigleUpload.single('image'), (req, res, next) => {
       res.send(result1);
     });
   });
+});
+
+app.get('/getcheckoutbyid', multerSigleUpload.single('image'), (req, res, next) => {
+  if(!req.cookies['jwt']){
+    return res.status(401).send("must login to see cart")
+  } else{
+  const theCookie = req.cookies['jwt'];
+  const decoded = jwt.verify(theCookie, 'secrect');
+  if(!decoded){
+    return res.status(401).send("unauthebtucated")
+  }
+ 
+    var db = "SELECT product_name FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id and user_user_id = " + decoded.id;
+    sql.connect((err) => {
+      sql.query(db, function (err, result1) {
+        for (let index = 0; index < result1.length; index++) {
+          var element = result1[index].product_name;
+          console.log(element);
+        }
+        res.send(result1);
+        console.log("kay");
+      });
+    });
+  
+}
 });
 
 app.put('/checkoutedit/:checkoutid', multerSigleUpload.single('image'), (req, res, next) => {

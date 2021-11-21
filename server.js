@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 const sql = require("./app/models/db.js");
 const cookieParser = require('cookie-parser')
-const router = express.Router();
 const { signupValidation, loginValidation } = require("./app/models/validation.js");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -209,6 +208,32 @@ app.post('/login', multerSigleUpload.single('image'), function (req, res) {
 //   res.redirect('/');
 // });
 
+// app.get('/getalluser', multerSigleUpload.single('image'), function (req, res) {
+//   // if (!req.cookies['jwt']) {
+//   //   return res.status(401).send("must login")
+//   // } else {
+//     const theCookie = req.cookies['jwt'];
+//     const decoded = jwt.verify(theCookie, 'secrect');
+//   //   if (!decoded) {
+//   //     return res.status(401).send("unauthebtucated")
+//   //   }
+//     sql.connect((err) => {
+//       sql.query('SELECT * FROM user where user_id=' + decoded.id, function (error, results) {
+//         if (results[0].role == 1) {
+//           var db = "SELECT * FROM user"
+//           sql.query(db, function (err, result) {
+//             res.status(200).send(result);
+//           });
+//         } else {
+//           return res.status(401).send("must be admin to see all user")
+//         }
+//       });
+//     });
+//   // }
+//   res.redirect('/');
+// });
+
+
 app.get('/getuser', multerSigleUpload.single('image'), (req, res, next) => {
   if (!req.cookies['jwt']) {
     return res.status(401).send("must login")
@@ -262,6 +287,33 @@ app.post('/checkout', multerSigleUpload.single('image'), (req, res, next) => {
   res.redirect('/');
 });
 
+app.delete('/checkoutdelete', multerSigleUpload.single('image'), (req, res) => {
+  if (!req.cookies['jwt']) {
+    return res.status(401).send("must login to see cart")
+  } else {
+    const theCookie = req.cookies['jwt'];
+    const decoded = jwt.verify(theCookie, 'secrect');
+    console.log(decoded);
+    if (!decoded) {
+      return res.status(401).send("unauthebtucated")
+    }
+    var db = "delete from orderdetail_has_product where orderDetail_order_id=" + req.body.orderDetail_order_id
+    sql.query(db, function (err, result) {
+      console.log(db);
+      console.log(result);
+      var db2 = "delete from orderdetail where order_id=" + req.body.orderDetail_order_id
+      sql.query(db2, function (err, result2) {
+        console.log(db2);
+        console.log(result2);
+      });
+    
+      });
+    }
+  
+  res.redirect('/');
+});
+
+
 
 app.get('/getcheckout', multerSigleUpload.single('image'), (req, res, next) => {
   var db = "SELECT * FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id";
@@ -286,7 +338,7 @@ app.get('/getcheckoutbyid', multerSigleUpload.single('image'), (req, res, next) 
     if (!decoded) {
       return res.status(401).send("unauthebtucated")
     }
-    var db = "SELECT product_name FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id and od.user_user_id = " + decoded.id;
+    var db = "SELECT * FROM product p, orderdetail od, orderdetail_has_product odh WHERE od.order_id = odh.orderDetail_order_id AND p.product_id = odh.product_product_id and od.user_user_id = " + decoded.id;
     sql.connect((err) => {
       sql.query(db, function (err, result1) {
         res.send(result1);

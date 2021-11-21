@@ -1,4 +1,4 @@
-## Dumb dork 
+Dumb dork 
 Start with
 node server.js or nodemon server.js
 Every image will save in public
@@ -21,6 +21,6 @@ Every image will save in public
 -post("/clearuser") to logout or clear login cookie
 
 >cart
--post("/checkout") post item to cart with product id
--get("/getcheckoutbyid") to see product
--delete("/checkoutdelete") to delete product from cart with order_id
+post("/checkout") post item to cart with product id
+get("/getcheckoutbyid") to see product
+delete("/checkoutdelete") to delete product from cart with order_id

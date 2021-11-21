@@ -1,22 +1,24 @@
 const Customer = require("../models/customer.model.js");
 
-// Create and Save a new Customer
 exports.create = (req, res) => {
-  // Validate request
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!"
     });
   }
 
-  // Create a Customer
+
   const customer = new Customer({
-    email: req.body.email,
+    emailaddress: req.body.emailaddress,
+    password: req.body.password,
     name: req.body.name,
-    active: req.body.active
+    phonenumber: req.body.phonenumber,
+    dob: req.body.dob,
+    address: req.body.address,
+    role: req.body.role,
   });
 
-  // Save Customer in the database
+
   Customer.create(customer, (err, data) => {
     if (err)
       res.status(500).send({
@@ -27,7 +29,7 @@ exports.create = (req, res) => {
   });
 };
 
-// Retrieve all Customers from the database.
+
 exports.findAll = (req, res) => {
   Customer.getAll((err, data) => {
     if (err)
@@ -39,19 +41,10 @@ exports.findAll = (req, res) => {
   });
 };
 
-//test
-exports.findAll1 = (req, res) => {
-  Customer.getAll((err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving customers."
-      });
-    else res.send(data);
-  });
-};
 
-// Find a single Customer with a customerId
+
+
+
 exports.findOne = (req, res) => {
   Customer.findById(req.params.customerId, (err, data) => {
     if (err) {
@@ -68,9 +61,9 @@ exports.findOne = (req, res) => {
   });
 };
 
-// Update a Customer identified by the customerId in the request
+
 exports.update = (req, res) => {
-  // Validate Request
+
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!"
@@ -98,7 +91,6 @@ exports.update = (req, res) => {
   );
 };
 
-// Delete a Customer with the specified customerId in the request
 exports.delete = (req, res) => {
   Customer.remove(req.params.customerId, (err, data) => {
     if (err) {
@@ -115,7 +107,6 @@ exports.delete = (req, res) => {
   });
 };
 
-// Delete all Customers from the database.
 exports.deleteAll = (req, res) => {
   Customer.removeAll((err, data) => {
     if (err)

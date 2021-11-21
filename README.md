@@ -25,4 +25,3 @@ post("/clearuser") to logout or clear login cookie.
 post("/checkout") post item to cart with product id.
 get("/getcheckoutbyid") to see product.
 delete("/checkoutdelete") to delete product from cart with order_id.
-

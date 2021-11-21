@@ -93,7 +93,6 @@ Product.remove = (product_id, result) => {
       result(null, err);
       return;
     }
-
     if (res.affectedRows == 0) {
       result({ kind: "not_found" }, null);
       return;

@@ -68,7 +68,6 @@ Customer.updateById = (user_id, customer, result) => {
       }
 
       if (res.affectedRows == 0) {
-        // not found Customer with the id
         result({ kind: "not_found" }, null);
         return;
       }
@@ -88,7 +87,6 @@ Customer.remove = (user_id, result) => {
     }
 
     if (res.affectedRows == 0) {
-      // not found Customer with the id
       result({ kind: "not_found" }, null);
       return;
     }

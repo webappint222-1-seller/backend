@@ -10,19 +10,6 @@ const Customer = function(customer) {
   this.role = customer.role;
 };
 
-Customer.create = (newCustomer, result) => {
-  sql.query("INSERT INTO user SET ?", newCustomer, (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(err, null);
-      return;
-    }
-
-    console.log("created user: ", { user_id: res.insertId, ...newCustomer });
-    result(null, { user_id: res.insertId, ...newCustomer });
-  });
-};
-
 Customer.findById = (user_id, result) => {
   sql.query(`SELECT * FROM user WHERE user_id = ${user_id}`, (err, res) => {
     if (err) {
@@ -56,27 +43,7 @@ Customer.getAll = result => {
 };
 
 
-Customer.updateById = (user_id, customer, result) => {
-  sql.query(
-    "UPDATE user SET emailaddress = ?, password = ?, name = ? , phonenumber = ? , DOB = ?, address = ? WHERE user_id = ?",
-    [customer.emailaddress, customer.password, customer.name, customer.phonenumber,customer.dob,customer.address ,user_id],
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
 
-      if (res.affectedRows == 0) {
-        result({ kind: "not_found" }, null);
-        return;
-      }
-
-      console.log("updated user: ", { user_id: user_id, ...customer });
-      result(null, { user_id: user_id, ...customer });
-    }
-  );
-};
 
 Customer.remove = (user_id, result) => {
   sql.query("DELETE FROM user WHERE user_id = ?", user_id, (err, res) => {
